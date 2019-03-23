@@ -1,19 +1,26 @@
 Set-Location (Split-Path ( & { $myInvocation.ScriptName } ) -parent)
 Add-Type -Path ".\WebAuthnModokiDesktop.dll";
 
-$rpid= Read-Host "Authenticator RPID"
-$pin= Read-Host "Authenticator PIN"
+Write-Host "ƒL[‚ğ‚³‚µ‚Ä‚­‚¾‚³‚¢"
+$poll = [gebo.CTAP2.Util.CmdExecuter]::Polling(5000).GetAwaiter().GetResult()
+if( $poll -eq $false ) {
+    Write-Host "Timeout"
+    return
+}
 
+Write-Host "RDPÚ‘±î•ñ‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢"
 $ip=Read-Host "RDP Host"
 $user= Read-Host "RDP User"
 $pass= Read-Host "RDP Password"
 
+Write-Host "“o˜^î•ñ‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢"
+$rpid= Read-Host "Authenticator RPID"
+$pin= Read-Host "Authenticator PIN"
+
 $cmd = "Cmdkey /generic:TERMSRV/${ip} /user:${user} /pass:${pass} & Start mstsc /v:${ip} & Timeout 2 & Cmdkey /delete:TERMSRV/${ip}";
 
 $blockcount = [gebo.CTAP2.Util.CmdExecuter]::CheckWriteBlockCount($cmd)
-$msg = "Register Count = " + [string]$blockcount
-Read-Host "Message : ${msg}"
+Write-Host "“o˜^ƒuƒƒbƒN” = ${blockcount}"
 
 $result = [gebo.CTAP2.Util.CmdExecuter]::RegisterCmd($rpid,$pin,$cmd).GetAwaiter().GetResult()
-
-Read-Host "Message : ${result}"
+Write-Host "${result}"
